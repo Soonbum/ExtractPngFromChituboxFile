@@ -1,0 +1,22 @@
+﻿/*
+ *                     GNU AFFERO GENERAL PUBLIC LICENSE
+ *                       Version 3, 19 November 2007
+ *  Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
+ *  Everyone is permitted to copy and distribute verbatim copies
+ *  of this license document, but changing it is not allowed.
+ */
+
+namespace UVtools.Core.Extensions;
+
+public static class UnitExtensions
+{
+    /// <summary>
+    /// 1 inch to 1 mm
+    /// </summary>
+    public const double InchToMillimeter = 25.4;
+
+    /// <summary>
+    /// 1 mm to 1 inch
+    /// </summary>
+    public const double MillimeterToInch = 0.0393700787;
+}
