@@ -28,18 +28,45 @@
         /// </summary>
         private void InitializeComponent()
         {
+            ButtonSelectCtb = new Button();
+            ButtonSavePngs = new Button();
             SuspendLayout();
+            // 
+            // ButtonSelectCtb
+            // 
+            ButtonSelectCtb.Location = new Point(30, 26);
+            ButtonSelectCtb.Name = "ButtonSelectCtb";
+            ButtonSelectCtb.Size = new Size(246, 60);
+            ButtonSelectCtb.TabIndex = 0;
+            ButtonSelectCtb.Text = "CTB 파일을 선택하세요.";
+            ButtonSelectCtb.UseVisualStyleBackColor = true;
+            ButtonSelectCtb.Click += ButtonSelectCtb_Click;
+            // 
+            // ButtonSavePngs
+            // 
+            ButtonSavePngs.Location = new Point(30, 108);
+            ButtonSavePngs.Name = "ButtonSavePngs";
+            ButtonSavePngs.Size = new Size(246, 60);
+            ButtonSavePngs.TabIndex = 1;
+            ButtonSavePngs.Text = "PNG 파일들을 저장하세요.";
+            ButtonSavePngs.UseVisualStyleBackColor = true;
+            ButtonSavePngs.Click += ButtonSavePngs_Click;
             // 
             // ExtractPngFromChituboxFile
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(309, 196);
+            Controls.Add(ButtonSavePngs);
+            Controls.Add(ButtonSelectCtb);
             Name = "ExtractPngFromChituboxFile";
             Text = "ExtractPngFromChituboxFile";
             ResumeLayout(false);
         }
 
         #endregion
+
+        private Button ButtonSelectCtb;
+        private Button ButtonSavePngs;
     }
 }
