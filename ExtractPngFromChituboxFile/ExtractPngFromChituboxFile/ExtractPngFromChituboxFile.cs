@@ -1,3 +1,9 @@
+using UVtools.Core.FileFormats;
+using UVtools.Core.Operations;
+using Emgu.CV;
+using System.Drawing;
+using System.Drawing.Imaging;
+
 namespace ExtractPngFromChituboxFile;
 
 public partial class ExtractPngFromChituboxFile : Form
@@ -38,13 +44,43 @@ public partial class ExtractPngFromChituboxFile : Form
             return;
         }
 
-        // ... DecodeInternally, DecodeCtbImage
+        try
+        {
+            // ChituboxFile 객체 생성 및 파일 경로 설정
+            using ChituboxFile ctbFile = new();
 
-        // ... 디코딩할 파일 ctb 경로를 알고 있고
-        // ... ctb 파일을 구조체로 읽어들인 후
-        // ... ctb 파일 구조체를 통해 레이어 개수를 알고, 모든 레이어를 추출한다. --> Mat 타입 값은 png 파일로 저장한다.
+            // Decode 실행 (이 과정에서 헤더와 레이어 정의가 로드됨)
+            // FileDecodeType.Full로 설정해야 이미지 데이터까지 읽어옵니다.
+            ctbFile.Decode(CtbFilePath, FileFormat.FileDecodeType.Full, new OperationProgress());
 
-        // ... 1. FileStream을 ChituboxFile로 저장할 것
-        // ... 2. DecodeCtbImage 함수를 이용해서 ChituboxFile로부터 PNG 이미지들을 추출한다.
+            // 저장 폴더 준비
+            string outputFolder = Path.Combine(Path.GetDirectoryName(CtbFilePath), Path.GetFileNameWithoutExtension(CtbFilePath) + "_layers");
+            if (!Directory.Exists(outputFolder)) Directory.CreateDirectory(outputFolder);
+
+            // 레이어 반복 추출
+            for (uint i = 0; i < ctbFile.LayerCount; i++)
+            {
+                // ChituboxFile 인덱서 또는 GetLayer를 통해 레이어 접근
+                var layer = ctbFile[i];
+
+                // LayerMat 프로퍼티를 통해 Mat(이미지 데이터) 가져오기
+                // 내부적으로 DecodeCtbImage를 호출하여 RLE를 풉니다.
+                using Mat mat = layer.LayerMat;
+
+                if (mat != null && !mat.IsEmpty)
+                {
+                    // Mat을 PNG 파일로 저장 (Emgu.CV 기능 이용)
+                    string fileName = $"Layer_{i:D4}.png";
+                    string filePath = Path.Combine(outputFolder, fileName);
+                    mat.Save(filePath);
+                }
+            }
+
+            MessageBox.Show($"완료! {ctbFile.LayerCount}개의 이미지가 저장되었습니다.");
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"오류 발생: {ex.Message}");
+        }
     }
 }
