@@ -13,6 +13,8 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
         <NoWarn>1701;1702;1591</NoWarn>
+      <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+      <SelfContained>false</SelfContained>
     </PropertyGroup>
 
     <ItemGroup>
