@@ -107,6 +107,19 @@ public partial class ExtractPngFromChituboxFile : Form
                 string outputFolder = Path.Combine(Path.GetDirectoryName(CtbFilePath), Path.GetFileNameWithoutExtension(CtbFilePath) + "_layers");
                 if (!Directory.Exists(outputFolder)) Directory.CreateDirectory(outputFolder);
 
+                // 썸네일(Thumbnail) 추출 및 저장
+                int thumbnailCount = ctbFile.ThumbnailsCount;
+                for (int i = 0; i < thumbnailCount; i++)
+                {
+                    var thumbnail = ctbFile.GetThumbnail(i);
+                    if (thumbnail != null && !thumbnail.IsEmpty)
+                    {
+                        string fileName = $"Thumbnail_{i + 1}.png";
+                        string filePath = Path.Combine(outputFolder, fileName);
+                        thumbnail.Save(filePath);
+                    }
+                }
+
                 // 레이어 추출 및 저장 진행률
                 uint layerCount = ctbFile.LayerCount;
                 for (uint i = 0; i < layerCount; i++)
