@@ -17,7 +17,7 @@ public partial class ExtractPngFromChituboxFile : Form
 
     private void ButtonSelectCtb_Click(object sender, EventArgs e)
     {
-        using OpenFileDialog openFileDialog = new OpenFileDialog();
+        using OpenFileDialog openFileDialog = new();
         
         // 초기 디렉토리 설정 (내 문서 등)
         openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
@@ -36,7 +36,7 @@ public partial class ExtractPngFromChituboxFile : Form
         }
     }
 
-    private void ButtonSavePngs_Click(object sender, EventArgs e)
+    private async void ButtonSavePngs_Click(object sender, EventArgs e)
     {
         if (string.IsNullOrEmpty(CtbFilePath) || !File.Exists(CtbFilePath))
         {
@@ -44,43 +44,61 @@ public partial class ExtractPngFromChituboxFile : Form
             return;
         }
 
+        // 버튼 비활성화 (중복 클릭 방지)
+        ButtonSavePngs.Enabled = false;
+        progressBar1.Value = 0;
+
         try
         {
-            // ChituboxFile 객체 생성 및 파일 경로 설정
-            using ChituboxFile ctbFile = new();
-
-            // Decode 실행 (이 과정에서 헤더와 레이어 정의가 로드됨)
-            // FileDecodeType.Full로 설정해야 이미지 데이터까지 읽어옵니다.
-            ctbFile.Decode(CtbFilePath, FileFormat.FileDecodeType.Full, new OperationProgress());
-
-            // 저장 폴더 준비
-            string outputFolder = Path.Combine(Path.GetDirectoryName(CtbFilePath), Path.GetFileNameWithoutExtension(CtbFilePath) + "_layers");
-            if (!Directory.Exists(outputFolder)) Directory.CreateDirectory(outputFolder);
-
-            // 레이어 반복 추출
-            for (uint i = 0; i < ctbFile.LayerCount; i++)
+            // 백그라운드 스레드에서 무거운 작업 실행
+            await Task.Run(() =>
             {
-                // ChituboxFile 인덱서 또는 GetLayer를 통해 레이어 접근
-                var layer = ctbFile[i];
+                // ChituboxFile 객체 생성 및 파일 경로 설정
+                using ChituboxFile ctbFile = [];
 
-                // LayerMat 프로퍼티를 통해 Mat(이미지 데이터) 가져오기
-                // 내부적으로 DecodeCtbImage를 호출하여 RLE를 풉니다.
-                using Mat mat = layer.LayerMat;
+                // Decode 실행 (내부적으로 decodeProgress를 통해 진행률이 업데이트됨)
+                ctbFile.Decode(CtbFilePath, FileFormat.FileDecodeType.Full, new OperationProgress());
 
-                if (mat != null && !mat.IsEmpty)
+                // 저장 폴더 준비
+                string outputFolder = Path.Combine(Path.GetDirectoryName(CtbFilePath), Path.GetFileNameWithoutExtension(CtbFilePath) + "_layers");
+                if (!Directory.Exists(outputFolder)) Directory.CreateDirectory(outputFolder);
+
+                // 레이어 추출 및 저장 진행률
+                uint layerCount = ctbFile.LayerCount;
+                for (uint i = 0; i < layerCount; i++)
                 {
-                    // Mat을 PNG 파일로 저장 (Emgu.CV 기능 이용)
-                    string fileName = $"Layer_{i:D4}.png";
-                    string filePath = Path.Combine(outputFolder, fileName);
-                    mat.Save(filePath);
-                }
-            }
+                    var layer = ctbFile[i];
+                    using Mat mat = layer.LayerMat;
 
-            MessageBox.Show($"완료! {ctbFile.LayerCount}개의 이미지가 저장되었습니다.");
+                    if (mat != null && !mat.IsEmpty)
+                    {
+                        string fileName = $"SEC_{i:D4}.png";
+                        string filePath = Path.Combine(outputFolder, fileName);
+                        mat.Save(filePath);
+                    }
+
+                    // 데이터 계산
+                    int currentStep = (int)(i + 1);
+                    int currentProgress = (int)(((double)currentStep / layerCount) * 100);
+                    string statusText = $"{currentStep} / {layerCount}"; // "현재 개수 / 총 개수"
+
+                    // UI 스레드 업데이트
+                    this.BeginInvoke(new Action(() => {
+                        progressBar1.Value = currentProgress;
+                        LabelProgress.Text = statusText;
+                    }));
+                }
+
+                MessageBox.Show($"완료! {ctbFile.LayerCount}개의 이미지가 저장되었습니다.");
+            });
         }
         catch (Exception ex)
         {
             MessageBox.Show($"오류 발생: {ex.Message}");
+        }
+        finally
+        {
+            ButtonSavePngs.Enabled = true;
         }
     }
 }

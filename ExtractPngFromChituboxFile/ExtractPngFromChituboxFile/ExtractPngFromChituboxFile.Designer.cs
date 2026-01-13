@@ -30,6 +30,8 @@
         {
             ButtonSelectCtb = new Button();
             ButtonSavePngs = new Button();
+            progressBar1 = new ProgressBar();
+            LabelProgress = new Label();
             SuspendLayout();
             // 
             // ButtonSelectCtb
@@ -52,21 +54,43 @@
             ButtonSavePngs.UseVisualStyleBackColor = true;
             ButtonSavePngs.Click += ButtonSavePngs_Click;
             // 
+            // progressBar1
+            // 
+            progressBar1.Location = new Point(30, 210);
+            progressBar1.Name = "progressBar1";
+            progressBar1.Size = new Size(246, 25);
+            progressBar1.TabIndex = 2;
+            // 
+            // LabelProgress
+            // 
+            LabelProgress.AutoSize = true;
+            LabelProgress.BackColor = Color.Transparent;
+            LabelProgress.Location = new Point(127, 184);
+            LabelProgress.Name = "LabelProgress";
+            LabelProgress.Size = new Size(52, 15);
+            LabelProgress.TabIndex = 3;
+            LabelProgress.Text = "Progress";
+            // 
             // ExtractPngFromChituboxFile
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(309, 196);
+            ClientSize = new Size(309, 256);
+            Controls.Add(LabelProgress);
+            Controls.Add(progressBar1);
             Controls.Add(ButtonSavePngs);
             Controls.Add(ButtonSelectCtb);
             Name = "ExtractPngFromChituboxFile";
             Text = "ExtractPngFromChituboxFile";
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
 
         private Button ButtonSelectCtb;
         private Button ButtonSavePngs;
+        private ProgressBar progressBar1;
+        private Label LabelProgress;
     }
 }
