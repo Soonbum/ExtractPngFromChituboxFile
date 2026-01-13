@@ -1,17 +1,56 @@
 ﻿using Emgu.CV;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UVtools.Core.FileFormats;
 using UVtools.Core.Operations;
 
-namespace ExtractPngFromChituboxFile;
+namespace CtbExtractor;
+
+public class LayerData
+{
+    public uint Index { get; set; }
+    public uint ResolutionX { get; set; }
+    public uint ResolutionY { get; set; }
+    public float LayerHeight { get; set; }
+    public float PositionZ { get; set; }
+    public bool CanExpose { get; set; }
+    public bool ShouldExpose { get; set; }
+    public bool ChangeResin { get; set; }
+    public bool IsEmpty { get; set; }
+    public bool IsBottomLayer { get; set; }
+    public float ExposureTime { get; set; }
+    public float LiftHeight { get; set; }
+    public float LiftSpeed { get; set; }
+    public float LiftAcceleration { get; set; }
+    public float LiftHeight2 { get; set; }
+    public float LiftSpeed2 { get; set; }
+    public float LiftAcceleration2 { get; set; }
+    public float RetractHeight { get; set; }
+    public float RetractSpeed { get; set; }
+    public float RetractAcceleration { get; set; }
+    public float RetractHeight2 { get; set; }
+    public float RetractSpeed2 { get; set; }
+    public float RetractAcceleration2 { get; set; }
+    public float LightOffDelay { get; set; }
+    public byte LightPWM { get; set; }
+    public float MaterialMilliliters { get; set; }
+    public float MaterialMillilitersPercent { get; set; }
+    public float MinimumSpeed { get; set; }
+    public float MaximumSpeed { get; set; }
+    public uint NonZeroPixelCount { get; set; }
+    public double NonZeroPixelPercentage { get; set; }
+    public double NonZeroPixelRatio { get; set; }
+    public float Area { get; set; }
+    public float Volume { get; set; }
+    public float PrintTime { get; set; }
+    public float StartTime { get; set; }
+    public float EndTime { get; set; }
+    public float WaitTimeBeforeCure { get; set; }
+    public float WaitTimeAfterCure { get; set; }
+    public float WaitTimeAfterLift { get; set; }
+}
 
 public class CtbExtractor
 {
-    public static bool ExtractAll(string filePath, string outputFolder, IProgress<double> progress)
+    public static bool ExtractAll(string filePath, string outputFolder)
     {
         // 기존에 작성하신 ButtonSavePngs_Click 로직을 여기에 구현
         // UVtools.Core를 사용하여 디코딩 및 PNG/XML 저장 수행
@@ -97,11 +136,9 @@ public class CtbExtractor
 
             // XML 파일로 저장
             string xmlFilePath = Path.Combine(outputFolder, $"SEC_{i:D4}.xml");
-            using (var writer = new StreamWriter(xmlFilePath))
-            {
-                var serializer = new System.Xml.Serialization.XmlSerializer(typeof(LayerData));
-                serializer.Serialize(writer, data);
-            }
+            using var writer = new StreamWriter(xmlFilePath);
+            var serializer = new System.Xml.Serialization.XmlSerializer(typeof(LayerData));
+            serializer.Serialize(writer, data);
 
             //layer.Index: Gets the layer number, 1 started
             //layer.ResolutionX
