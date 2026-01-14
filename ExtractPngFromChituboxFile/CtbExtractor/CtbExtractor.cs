@@ -50,7 +50,7 @@ public class LayerData
 
 public class CtbExtractor
 {
-    public static bool ExtractAll(string filePath, string outputFolder)
+    public static bool ExtractAll(string filePath, string outputFolder, Action<int> progressCallback)
     {
         // 기존에 작성하신 ButtonSavePngs_Click 로직을 여기에 구현
         // UVtools.Core를 사용하여 디코딩 및 PNG/XML 저장 수행
@@ -59,7 +59,9 @@ public class CtbExtractor
         using ChituboxFile ctbFile = [];
 
         // Decode 실행 (내부적으로 decodeProgress를 통해 진행률이 업데이트됨)
+        progressCallback?.Invoke(5);    // 5%
         ctbFile.Decode(filePath, FileFormat.FileDecodeType.Full, new OperationProgress());
+        progressCallback?.Invoke(10);   // 10%
 
         // 저장 폴더 준비
         if (!Directory.Exists(outputFolder)) Directory.CreateDirectory(outputFolder);
@@ -75,6 +77,7 @@ public class CtbExtractor
                 thumbnail.Save(Path.Combine(outputFolder, fileName));
             }
         }
+        progressCallback?.Invoke(15);   // 15%
 
         // 레이어 추출 및 저장 진행률
         uint layerCount = ctbFile.LayerCount;
@@ -139,6 +142,10 @@ public class CtbExtractor
             using var writer = new StreamWriter(xmlFilePath);
             var serializer = new System.Xml.Serialization.XmlSerializer(typeof(LayerData));
             serializer.Serialize(writer, data);
+
+            // 진행률 계산 (15%부터 시작하여 100%까지 분포)
+            int currentProgress = 15 + (int)(((double)(i + 1) / layerCount) * 85);
+            progressCallback?.Invoke(currentProgress);
 
             //layer.Index: Gets the layer number, 1 started
             //layer.ResolutionX
