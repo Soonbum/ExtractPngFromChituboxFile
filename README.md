@@ -13,7 +13,7 @@
   - CtbExtractor: ExtractPngFromChituboxFile 프로젝트에서 CTB 파일 추출 기능만 따로 떼어놓은 클래스로 DLL 파일을 생성하기 위한 프로젝트
   - NativeBridge: Qt C++에서 CtbExtractor.dll을 사용하기 위해 만든 Bridge 클래스
 
-* CtbExtractorQt
+* CtbExtractorQt (Qt C++ 프로젝트)
   - CtbExtractorQt.pro, CtbExtractorQt.pro.user: Qt 프로젝트 설정 파일
   - mainwindow.cpp, mainwindow.h, mainwindow.ui: 프로그램 GUI
   - NativeBridge.h: NativeBridge.dll을 호출하기 위한 헤더 파일
